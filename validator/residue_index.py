@@ -119,16 +119,21 @@ class ResidueIndexes(object):
         :param depositor_aa_type: Residue amino acid code provided by user
         :return: True is residue numbering is valid, False if not
         """
-        flag = None
+        flag = False
         for item in data:
             sub_data = item[label]
             if label == "chains":
-                flag = self._recursive_loop(sub_data, "residues", depositor_residue_number, depositor_aa_type,
+                flag |= self._recursive_loop(sub_data, "residues", depositor_residue_number, depositor_aa_type,
                                             depositor_chain_id)
             elif label == "residues":
                 return self._process_residues(sub_data, depositor_residue_number, depositor_aa_type, depositor_chain_id)
+
         if label == "chains":
             return flag
+
+        if label == "residues":
+            # We were checking residues and none was found, so not match found -> False.
+            return False
 
     def _process_residues(self, residues, depositor_residue_number, depositor_aa_type, depositor_chain_id):
         """
